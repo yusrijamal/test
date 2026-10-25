@@ -26,6 +26,18 @@ function upsertUser(chatId, name) {
   }
 }
 
+function setName(chatId, name) {
+  const key = String(chatId);
+  if (data.users[key]) {
+    data.users[key].name = name;
+    save(data);
+  }
+}
+
+function getUser(chatId) {
+  return data.users[String(chatId)];
+}
+
 function getAllUserIds() {
   return Object.keys(data.users);
 }
@@ -64,6 +76,8 @@ function getTotals(chatId) {
 
 module.exports = {
   upsertUser,
+  setName,
+  getUser,
   getAllUserIds,
   recordKm,
   recordPushups,

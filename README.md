@@ -6,7 +6,9 @@ Every day at 8pm it asks each registered user:
 1. How many km did you brisk walk with 5kg weights today? (free text, e.g. `3` or `3km`; it re-asks if it can't find a number)
 2. Did you do 10 pushups today? (Yes/No buttons)
 
-Every Thursday at 9pm it sends each user a summary of their totals to date (total km, pushup days completed, days tracked).
+Every Thursday at 9pm it sends each user a summary of their totals to date (total km, pushup days completed, days tracked), checked against the goal of **30km by 13/11** and **10 pushups every day** — with a motivational nudge if they're falling behind pace.
+
+On `/start` the bot also asks for the user's name, which it uses in the weekly summary greeting.
 
 ## Setup
 
