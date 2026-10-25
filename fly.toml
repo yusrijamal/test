@@ -1,0 +1,15 @@
+app = "yusri-wajibot"
+primary_region = "sin"
+
+[build]
+
+[env]
+  TIMEZONE = "Asia/Jakarta"
+  DB_PATH = "/data/wajibot.db"
+  GOAL_KM = "30"
+  GOAL_DEADLINE = "2026-11-13"
+  GOAL_PUSHUPS = "10"
+
+[[mounts]]
+  source = "wajibotdata"
+  destination = "/data"
