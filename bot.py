@@ -116,8 +116,8 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Welcome to wajibot! 🌙\n\n"
         f"Every day at 8pm I'll ask how far you brisk walked (with 5kg weights) and whether you did your "
-        f"{GOAL_PUSHUPS} pushups. Every Thursday at 9pm I'll share everyone's progress toward the group goal "
-        f"of {GOAL_KM:g}km by {GOAL_DEADLINE.strftime('%d/%m')}.\n\n"
+        f"{GOAL_PUSHUPS} pushups. Every Thursday at 9pm I'll share everyone's own progress toward their "
+        f"goal of {GOAL_KM:g}km by {GOAL_DEADLINE.strftime('%d/%m')}.\n\n"
         "What's your name?"
     )
 
@@ -160,7 +160,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data.clear()
         await update.message.reply_text(
             f"Nice to meet you, {escape(name)}! I'll check in with you every day at 8pm. "
-            f"The group goal is {GOAL_KM:g}km by {GOAL_DEADLINE.strftime('%d/%m')} plus "
+            f"Your goal is {GOAL_KM:g}km by {GOAL_DEADLINE.strftime('%d/%m')} plus "
             f"{GOAL_PUSHUPS} pushups every day. Let's go! 💪",
             parse_mode="HTML",
         )
@@ -290,15 +290,13 @@ def build_weekly_summary():
     elapsed = max((today - start).days, 0)
     expected_km = GOAL_KM * min(elapsed / total_days, 1)
 
-    lines = [f"📊 Weekly progress toward {GOAL_KM:g}km by {GOAL_DEADLINE.strftime('%d/%m')}", ""]
+    lines = [f"📊 Weekly progress — everyone's own goal of {GOAL_KM:g}km by {GOAL_DEADLINE.strftime('%d/%m')}", ""]
     laggers = []
-    group_km = 0.0
 
     for u in users:
         km = db.get_total_km(u["user_id"])
         tracked_days = db.get_tracked_days(u["user_id"])
         pushup_days = db.get_pushup_days(u["user_id"])
-        group_km += km
 
         pct = min(round((km / GOAL_KM) * 100), 999)
         lines.append(
@@ -307,9 +305,6 @@ def build_weekly_summary():
         )
         if km < expected_km * 0.9:
             laggers.append(u)
-
-    lines.append("")
-    lines.append(f"Group total: {group_km:g}km")
 
     if laggers:
         lines.append("")
