@@ -3,4 +3,5 @@
 **/wajibot.db
 **/__pycache__
 **/*.pyc
+**/.venv
 fly.toml
