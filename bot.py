@@ -3,7 +3,7 @@ import re
 import logging
 import pytz
 from html import escape
-from datetime import datetime, date, time as Time
+from datetime import datetime, date, timedelta, time as Time
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import TelegramError
@@ -249,6 +249,25 @@ async def handle_pushup_callback(update: Update, context: ContextTypes.DEFAULT_T
 # Scheduled jobs
 # ---------------------------------------------------------------------------
 
+async def job_morning_catchup(context: ContextTypes.DEFAULT_TYPE):
+    """7am: give anyone who missed yesterday's check-in one more chance to log it."""
+    yesterday = (now_local().date() - timedelta(days=1)).isoformat()
+    for u in db.get_all_users():
+        if db.has_checked_in(u["user_id"], yesterday):
+            continue
+        context.application.user_data[u["user_id"]]["step"] = "awaiting_km"
+        context.application.user_data[u["user_id"]]["checkin_date"] = yesterday
+        try:
+            await context.bot.send_message(
+                u["chat_id"],
+                f"⏰ Looks like yesterday ({yesterday}) didn't get logged — want to catch up now? "
+                "🚶 How many km did you brisk walk yesterday with 5kg weights? "
+                "(just the number is fine, e.g. 3 or 3km)",
+            )
+        except TelegramError as e:
+            logger.warning("Failed to send morning catch-up to user_id=%s: %s", u["user_id"], e)
+
+
 async def job_daily_checkin(context: ContextTypes.DEFAULT_TYPE):
     today = now_local().date().isoformat()
     for u in db.get_all_users():
@@ -351,6 +370,8 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
     jq = app.job_queue
+    jq.run_daily(job_morning_catchup, Time(7, 0, tzinfo=TZ), name="morning_catchup")
+    jq.run_once(job_morning_catchup, when=10, name="morning_catchup_on_start")
     jq.run_daily(job_daily_checkin, Time(20, 0, tzinfo=TZ), name="daily_checkin")
     jq.run_daily(job_nudge, Time(22, 0, tzinfo=TZ), name="nudge")
     jq.run_daily(job_weekly_summary, Time(21, 0, tzinfo=TZ), days=(3,), name="weekly_summary")  # Thursday

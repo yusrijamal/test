@@ -7,14 +7,18 @@ and SQLite.
 ## What it does
 
 - `/start` — greets a new person and asks their name.
+- Every day at **7:00 AM**, anyone who didn't log the previous day gets a catch-up prompt
+  so a missed evening doesn't just silently fall off — they can still log yesterday's km
+  before today's check-in.
 - Every day at **8:00 PM**, it DMs each registered person:
   1. "How many km did you brisk walk today with 5kg weights?" — free text; answers like
      `3` or `3km` are both understood. If the reply is unclear, it asks again.
   2. "Did you do your 10 pushups today?" — Yes/No buttons (typed "yes"/"no" also works).
 - At **10:00 PM**, anyone who hasn't finished that day's check-in gets a one-line nudge.
-- Every **Thursday at 9:00 PM**, it posts a summary of everyone's total km toward the
-  group goal, pushup consistency, and the group total. Anyone behind the pace needed to
-  hit the goal gets called out by name to motivate them.
+- Every **Thursday at 9:00 PM**, it posts each person's own progress toward their
+  individual goal (not pooled — everyone has the same target but their own total) and
+  pushup consistency. Anyone behind the pace needed to hit their goal gets called out by
+  name to motivate them.
 - `/setgroup` — run inside a group chat to make that the destination for the weekly
   summary (otherwise it DMs each person individually).
 - `/status` — shows your own progress and streaks.
